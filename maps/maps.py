@@ -17,7 +17,8 @@ class MapExercise:
         Ключи словаря: name, rating_kinopoisk, rating_imdb, genres, year, access_level, country
         :return: Средний рейтинг фильмов у которых две или больше стран
         """
-        country_filter = filter(lambda movie: len(movie["country"].split(",")) > 1, list_of_movies)
+
+        country_filter = filter(lambda movie: movie["country"].find(",") > 1, list_of_movies)
 
         rating = list(
             map(
