@@ -1,4 +1,8 @@
-from flask import Flask
+from flask import Flask, request, jsonify
+from http import HTTPStatus
+from typing import Any, DefaultDict
+
+users = DefaultDict[str, dict]()
 
 
 class FlaskExercise:
@@ -28,4 +32,36 @@ class FlaskExercise:
 
     @staticmethod
     def configure_routes(app: Flask) -> None:
-        pass
+        @app.route("/user/<name>", methods=["GET"])
+        def get(name: str) -> Any:
+            if name in users.keys():
+                response = jsonify({"data": f"My name is {name}"}), HTTPStatus.OK
+                return response
+            return jsonify(HTTPStatus.NOT_FOUND), HTTPStatus.NOT_FOUND
+
+        @app.route("/user", methods=["POST"])
+        def post() -> Any:
+            body = request.json
+            if "name" not in body.keys():
+                response = (
+                    jsonify({"errors": {"name": "This field is required"}}),
+                    HTTPStatus.UNPROCESSABLE_ENTITY,
+                )
+                return response
+            users.update({body["name"]: {}})
+            return jsonify({"data": f"User {body.get('name')} is created!"}), HTTPStatus.CREATED
+
+        @app.route("/user/<name>", methods=["PATCH"])
+        def patch(name: str) -> Any:
+            body = request.json
+            new_name = body["name"]
+            if name in users.keys():
+                users[new_name] = users.pop(name)
+                return jsonify({"data": f"My name is {new_name}"}), HTTPStatus.OK
+            return jsonify(HTTPStatus.NO_CONTENT)
+
+        @app.route("/user/<name>", methods=["DELETE"])
+        def delete(name: str) -> Any:
+            if name in users.keys():
+                users.pop(name)
+            return f"{HTTPStatus.NO_CONTENT}", HTTPStatus.NO_CONTENT
