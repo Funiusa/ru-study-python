@@ -57,11 +57,14 @@ class FlaskExercise:
             new_name = body["name"]
             if name in users.keys():
                 users[new_name] = users.pop(name)
-                return jsonify({"data": f"My name is {new_name}"}), HTTPStatus.OK
-            return jsonify(HTTPStatus.NO_CONTENT)
+                response = jsonify({"data": f"My name is {new_name}"}), HTTPStatus.OK
+                return response
+            return jsonify(HTTPStatus.NOT_FOUND)
 
         @app.route("/user/<name>", methods=["DELETE"])
         def delete(name: str) -> Any:
             if name in users.keys():
                 users.pop(name)
-            return f"{HTTPStatus.NO_CONTENT}", HTTPStatus.NO_CONTENT
+                response = f"{HTTPStatus.NO_CONTENT}", HTTPStatus.NO_CONTENT
+                return response
+            return jsonify(HTTPStatus.NOT_FOUND), HTTPStatus.NOT_FOUND
